@@ -5,7 +5,7 @@ export default [
   },
   {
     id: 2,
-    title: 'Хозтовары/Инструменты',
+    title: 'Хозтовары',
   },
   {
     id: 3,
@@ -19,4 +19,4 @@ export default [
     id: 5,
     title: 'Гаджет',
   },
-]
+];
