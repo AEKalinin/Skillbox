@@ -118,5 +118,11 @@ import Cardindicator from '@/components/Cardindicator.vue';
 
 export default {
   components: { Cardindicator },
+  mounted() {
+    this.$store.commit(
+      'deleteCartProduct',
+      1,
+    );
+  },
 };
 </script>

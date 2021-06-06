@@ -74,11 +74,5 @@ export default {
       return this.filteredProducts.length;
     },
   },
-  mounted() {
-    this.$store.commit(
-      'deleteCartProduct',
-      1,
-    );
-  },
 };
 </script>
