@@ -7,7 +7,7 @@
     </svg>
   </button>
 
-    <input type="text" :value="productAmount" >
+    <input type="text" v-model.number="productAmount" :text="productAmount" @input="spinAmount(0)">
 
     <button type="button" aria-label="Добавить один товар"
             @click.prevent="spinAmount(1)">
@@ -31,6 +31,8 @@ export default {
       if (this.productAmount + delta > 0) {
         this.productAmount += delta;
         this.chAmount(this.productAmount);
+      } else {
+        this.productAmount = 1;
       }
     },
     chAmount(productAmount) {

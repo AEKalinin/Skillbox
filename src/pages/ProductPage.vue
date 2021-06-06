@@ -101,7 +101,7 @@
             </fieldset>
 
             <div class="item__row">
-              <ChangeProductAmount v-model.number="productAmount" />
+              <ChangeProductAmount v-model.number:="productAmount" />
 
               <button class="button button--primery" type="submit">
                 В корзину
