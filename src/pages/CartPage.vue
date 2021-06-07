@@ -32,7 +32,7 @@
         Корзина
       </h1>
       <span class="content__info">
-        {{totalAmount}} товара
+        {{allProduct}} товара
       </span>
     </div>
 
@@ -77,6 +77,7 @@ export default {
       products: 'cartDetailProduct',
       totalPrice: 'cartTotalPrice',
       totalAmount: 'cartTotalAmount',
+      allProduct: 'cartAllProduct',
     }),
   },
 };
