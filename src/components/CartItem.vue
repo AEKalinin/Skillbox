@@ -32,7 +32,7 @@
     </b>
 
     <button class="product__del button-del" type="button"
-            aria-label="Удалить товар из корзины" @click.prevent="deleteProduct(item.productId)">
+            aria-label="Удалить товар из корзины" @click.prevent="deleteProduct">
       <svg width="20" height="20" fill="currentColor">
         <use xlink:href="#icon-close"></use>
       </svg>
@@ -43,7 +43,7 @@
 
 <script>
 import numberFormat from '@/helpers/numberFormat';
-import { mapMutations } from 'vuex';
+import { mapActions } from 'vuex';
 
 export default {
   filters: { numberFormat },
@@ -54,7 +54,7 @@ export default {
         return this.item.amount;
       },
       set(value) {
-        this.$store.commit(
+        this.$store.dispatch(
           'updateCartProductAmount',
           { productId: this.item.productId, amount: value },
         );
@@ -62,7 +62,11 @@ export default {
     },
   },
   methods: {
-    ...mapMutations({ deleteProduct: 'deleteCartProduct' }),
+    ...mapActions(['deleteCartProduct']),
+    deleteProduct() {
+      this.deleteCartProduct({ productId: this.item.productId });
+    },
   },
+
 };
 </script>

@@ -27,10 +27,10 @@
           </a>
         </li>
       </ul>
-
-      <h1 class="content__title">
-        Корзина
-      </h1>
+      <h1 class="content__title"> Корзина </h1>
+      <div
+        v-if="$store.state.cartProductsLoading">Загрузка корзины...
+      </div>
       <span class="content__info">
         {{allProduct}} товара
       </span>

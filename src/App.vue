@@ -115,14 +115,20 @@
 <script>
 
 import Cardindicator from '@/components/Cardindicator.vue';
+import { mapActions, mapMutations } from 'vuex';
 
 export default {
   components: { Cardindicator },
-  mounted() {
-    this.$store.commit(
-      'deleteCartProduct',
-      1,
-    );
+  created() {
+    const userAccessKey = localStorage.getItem('userAccessKey');
+    if (userAccessKey) {
+      this.updateUserAccessKey(userAccessKey);
+    }
+    this.loadCart();
+  },
+  methods: {
+    ...mapActions(['loadCart']),
+    ...mapMutations(['updateUserAccessKey']),
   },
 };
 </script>

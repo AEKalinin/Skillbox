@@ -31,9 +31,9 @@
     <legend class="form__legend">Цвет</legend>
     <ul class="colors">
         <label class="colors__label" v-for="color in colors" :key="color.id" >
-          <input class="colors__radio sr-only" type="radio" name="color" :value="color.value"
+          <input class="colors__radio sr-only" type="radio" name="color" :value="color.id"
                  v-model="currentColorValue">
-          <span class="colors__value" :style="{backgroundColor: color.value}">
+          <span class="colors__value" :style="{backgroundColor: color.code}">
           </span>
         </label>
     </ul>
@@ -113,25 +113,29 @@
 </template>
 
 <script>
-import categories from '@/data/categories';
-import colors from '@/data/colors';
+import axios from 'axios';
+import { API_BASE_URL } from '@/config';
 
+/* eslint-disable no-return-assign */
+/* eslint-disable prefer-template */
 export default {
   data() {
     return {
       currentPriceFrom: 0,
       currentPriceFTo: 0,
       currentCategoryId: 0,
-      currentColorValue: null,
+      currentColorValue: 0,
+      categoriesData: null,
+      colorsData: null,
     };
   },
   props: ['priceFrom', 'priceTo', 'categoryId', 'colorValue'],
   computed: {
     categories() {
-      return categories;
+      return this.categoriesData ? this.categoriesData.items : [];
     },
     colors() {
-      return colors;
+      return this.colorsData ? this.colorsData.items : [];
     },
   },
   watch: {
@@ -161,6 +165,19 @@ export default {
       this.$emit('update:categoryId', 0);
       this.$emit('update:colorValue', null);
     },
+    loadCategories() {
+      axios.get(API_BASE_URL + 'api/productCategories')
+        .then((response) => this.categoriesData = response.data);
+    },
+    loadColors() {
+      axios.get(API_BASE_URL + 'api/colors')
+        .then((response) => this.colorsData = response.data);
+    },
+  },
+  created() {
+    this.loadCategories();
+    this.loadColors();
   },
 };
 </script>
+/* es-lint-enable */
