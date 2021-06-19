@@ -32,7 +32,7 @@
         v-if="$store.state.cartProductsLoading">Загрузка корзины...
       </div>
       <span class="content__info">
-        {{allProduct}} товара
+        {{ allProduct }} товара
       </span>
     </div>
 
@@ -52,9 +52,11 @@
             Итого: <span>{{ totalPrice | numberFormat }} ₽</span>
           </p>
 
-          <button class="cart__button button button--primery" type="submit">
+          <router-link v-if="allProduct>0"
+            tag="button" :to="{name: 'order'}" class="cart__button button button--primery"
+            type="submit">
             Оформить заказ
-          </button>
+          </router-link>
         </div>
       </form>
     </section>

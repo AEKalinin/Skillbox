@@ -1,10 +1,8 @@
 <template>
-  <body>
     <div class="loadRing">
       <p> {{ message }}</p>
       <div class="ring-1"></div>
     </div>
-  </body>
 </template>
 
 <style>
@@ -13,8 +11,8 @@
   width: 10px;
   height: 10px;
   margin: 0 auto;
-  padding: 10px;
-  border: 17px dashed #4b9cdb;
+  padding: 20px;
+  border: 20px dashed #4b9cdb;
   border-radius: 100%;
 }
 
