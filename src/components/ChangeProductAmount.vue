@@ -7,7 +7,7 @@
     </svg>
   </button>
 
-   <input type="number" v-model.number="amount" @input="changeAmount(0)" >
+   <input type="number" v-model.number="amount"  readonly  >
 
     <button type="button" aria-label="Добавить один товар"
             @click.prevent="changeAmount(1)">
