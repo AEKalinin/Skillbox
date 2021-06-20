@@ -12,19 +12,7 @@
               </span>
 
     <div class="product__counter form__counter">
-      <button type="button" aria-label="Убрать один товар">
-        <svg width="10" height="10" fill="currentColor">
-          <use xlink:href="#icon-minus"></use>
-        </svg>
-      </button>
-
-      <input type="text" v-model.number="amount" name="count">
-
-      <button type="button" aria-label="Добавить один товар">
-        <svg width="10" height="10" fill="currentColor">
-          <use xlink:href="#icon-plus"></use>
-        </svg>
-      </button>
+      <ChangeProductAmount v-model.number="amount"/>
     </div>
 
     <b class="product__price">
@@ -44,8 +32,10 @@
 <script>
 import numberFormat from '@/helpers/numberFormat';
 import { mapActions } from 'vuex';
+import ChangeProductAmount from '@/components/ChangeProductAmount.vue';
 
 export default {
+  components: { ChangeProductAmount },
   filters: { numberFormat },
   props: ['item'],
   computed: {
