@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
-import { API_BASE_URL } from '@/config';
+import { API_BASE_URL_DIP } from '../config';
 
 Vue.use(Vuex);
 
@@ -52,7 +52,7 @@ export default new Vuex.Store({
     syncCartProducts(state) {
       state.cartProducts = state.cartProductsDate.map((item) => {
         return {
-          productId: item.product.id,
+          productId: item.productOffer.id,
           amount: item.quantity,
         };
       });
@@ -63,33 +63,24 @@ export default new Vuex.Store({
   },
   getters: {
     cartDetailProduct(state) {
-      return state.cartProducts.map((item) => {
-        const product = state.cartProductsDate.find((p) => p.product.id === item.productId).product;
-        return {
-          ...item,
-          product: {
-            ...product,
-            image: product.image.file.url,
-          },
-        };
-      });
+      return state.cartProductsDate;
     },
     cartTotalPrice(state, getters) {
-      return getters.cartDetailProduct.reduce((acc, item) => (item.product.price * item.amount)
+      return getters.cartDetailProduct.reduce((acc, item) => (item.price * item.quantity)
       + acc, 0);
     },
     cartTotalAmount(state, getters) {
       return getters.cartDetailProduct.length;
     },
     cartAllProduct(state, getters) {
-      return getters.cartDetailProduct.reduce((acc, item) => (item.amount)
+      return getters.cartDetailProduct.reduce((acc, item) => (item.quantity)
         + acc, 0);
     },
   },
   actions: {
     loadOrderInfo(context, orderId) {
       return axios
-        .get(API_BASE_URL + 'api/orders/' + orderId, {
+        .get(API_BASE_URL_DIP + 'api/orders/' + orderId, {
           params: {
             userAccessKey: context.state.userAccessKey,
           },
@@ -102,7 +93,7 @@ export default new Vuex.Store({
       context.commit('chageCartProductsLoading');
       this.loadProductsTimer = setTimeout(() => {
         return axios
-          .get(API_BASE_URL + 'api/baskets', {
+          .get(API_BASE_URL_DIP + 'api/baskets', {
             params: {
               userAccessKey: context.state.userAccessKey,
             },
@@ -118,12 +109,13 @@ export default new Vuex.Store({
           .then(() => context.commit('chageCartProductsLoading'));
       }, 500);
     },
-    addProductToCart(context, { productId, amount }) {
-      return (new Promise((resolve) => setTimeout(resolve, 2000)))
+    addProductToCart(context, { productOfferId, colorId, amount }) {
+      return (new Promise((resolve) => setTimeout(resolve, 100)))
         .then(() => {
           return axios
-            .post(API_BASE_URL + 'api/baskets/products', {
-              productId: productId,
+            .post(API_BASE_URL_DIP + 'api/baskets/products', {
+              productOfferId: productOfferId,
+              colorId: colorId,
               quantity: amount,
             }, {
               params: {
@@ -142,8 +134,8 @@ export default new Vuex.Store({
         return;
       }
       return axios
-        .put(API_BASE_URL + 'api/baskets/products', {
-          productId: productId,
+        .put(API_BASE_URL_DIP + 'api/baskets/products', {
+          basketItemId: productId,
           quantity: amount,
         }, {
           params: {
@@ -161,8 +153,8 @@ export default new Vuex.Store({
       return (new Promise((resolve) => setTimeout(resolve, 0)))
         .then(() => {
           return axios
-            .delete(API_BASE_URL + 'api/baskets/products', {
-              data: { productId: productId },
+            .delete(API_BASE_URL_DIP + 'api/baskets/products', {
+              data: { basketItemId: productId },
               params: { userAccessKey: context.state.userAccessKey },
             })
             .then((response) => {

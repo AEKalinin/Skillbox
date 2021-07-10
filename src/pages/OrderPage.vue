@@ -86,11 +86,11 @@
 
         <div class="cart__block">
           <ul class="cart__orders">
-            <li class="cart__order" v-for="item in products" :key="item.productId">
-              <h3>{{ item.product.title }}</h3>
-              <b>{{ item.amount * item.product.price | numberFormat }} ₽</b>
-              <span>Артикул: {{ item.product.id }}</span>
-              <span>Кол-во: {{ item.amount }} шт.</span>
+            <li class="cart__order" v-for="item in products" :key="item.productOffer.product.id">
+              <h3>{{ item.productOffer.title }}</h3>
+              <b>{{ item.quantity * item.price | numberFormat }} ₽</b>
+              <span>Артикул: {{ item.productOffer.product.id }}</span>
+              <span>Кол-во: {{ item.quantity }} шт.</span>
             </li>
           </ul>
 
@@ -122,8 +122,8 @@ import BaseFormTextarea from '@/components/BaseFormTextarea.vue';
 import { mapGetters } from 'vuex';
 import numberFormat from '@/helpers/numberFormat';
 import axios from 'axios';
-import { API_BASE_URL } from '@/config';
 import preloadProducts from '@/preloadProducts.vue';
+import { API_BASE_URL_DIP } from '../config';
 
 /* eslint-disable prefer-template */
 export default {
@@ -151,7 +151,7 @@ export default {
       this.orderPreloader = true;
       this.loadProductsTimer = setTimeout(() => {
         axios
-          .post(API_BASE_URL + 'api/orders', {
+          .post(API_BASE_URL_DIP + 'api/orders', {
             ...this.fromData,
           }, {
             params: {

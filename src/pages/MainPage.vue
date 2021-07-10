@@ -34,7 +34,7 @@ import BasePaginattion from '@/components/BasePaginattion.vue';
 import ProductFilter from '@/components/ProductFilter.vue';
 import preloadProducts from '@/preloadProducts.vue';
 import axios from 'axios';
-import { API_BASE_URL } from '@/config';
+import { API_BASE_URL_DIP } from '../config';
 
 /* eslint-disable prefer-template */
 /* eslint-disable no-return-assign */
@@ -49,8 +49,8 @@ export default {
   },
   data() {
     return {
-      filterPriceFrom: 0,
-      filterPriceTo: 0,
+      filterPriceFrom: 1,
+      filterPriceTo: 100000,
       filterCategoryId: 0,
       filterColorValue: 0,
       page: 1,
@@ -62,14 +62,7 @@ export default {
   },
   computed: {
     products() {
-      return this.productsData ? this.productsData.items.map(
-        (product) => {
-          return {
-            ...product,
-            image: product.image.file.url,
-          };
-        },
-      ) : [];
+      return this.productsData ? this.productsData : [];
     },
     countProducts() {
       return this.productsData ? this.productsData.pagination.total : 0;
@@ -81,14 +74,13 @@ export default {
       this.productsLoadingFailed = false;
       clearTimeout(this.loadProductsTimer);
       this.loadProductsTimer = setTimeout(() => {
-        axios.get(API_BASE_URL + 'api/products', {
+        axios.get(API_BASE_URL_DIP + 'api/products', {
           params: {
             page: this.page,
             limit: this.productsPerPage,
             categoryId: this.filterCategoryId,
             minPrice: this.filterPriceFrom,
             maxPrice: this.filterPriceTo,
-            colorId: this.filterColorValue,
           },
         })
           .then((response) => this.productsData = response.data)

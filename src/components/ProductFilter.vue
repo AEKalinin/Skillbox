@@ -113,11 +113,13 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { API_BASE_URL } from '@/config';
-
 /* eslint-disable no-return-assign */
 /* eslint-disable prefer-template */
+/* eslint-disable import/no-duplicates */
+
+import axios from 'axios';
+import { API_BASE_URL_DIP } from '@/config';
+
 export default {
   data() {
     return {
@@ -166,11 +168,11 @@ export default {
       this.$emit('update:colorValue', null);
     },
     loadCategories() {
-      axios.get(API_BASE_URL + 'api/productCategories')
+      axios.get(API_BASE_URL_DIP + 'api/productCategories')
         .then((response) => this.categoriesData = response.data);
     },
     loadColors() {
-      axios.get(API_BASE_URL + 'api/colors')
+      axios.get(API_BASE_URL_DIP + 'api/colors')
         .then((response) => this.colorsData = response.data);
     },
   },

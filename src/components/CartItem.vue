@@ -1,14 +1,14 @@
 <template>
   <li class="cart__item product">
     <div class="product__pic">
-      <img :src="item.product.image" width="120" height="120"
+      <img :src="item.productOffer.product.preview.file.url" width="120" height="120"
            alt="item.product.title">
     </div>
     <h3 class="product__title">
-      {{ item.product.title }}
+      {{ item.productOffer.title }}
     </h3>
     <span class="product__code">
-                Артикул: {{ item.product.id }}
+                Артикул: {{ item.productOffer.product.id }}
               </span>
 
     <div class="product__counter form__counter">
@@ -16,7 +16,7 @@
     </div>
 
     <b class="product__price">
-      {{ item.amount * item.product.price | numberFormat}} ₽
+      {{ item.quantity * item.price | numberFormat}} ₽
     </b>
 
     <button class="product__del button-del" type="button"
@@ -41,12 +41,12 @@ export default {
   computed: {
     amount: {
       get() {
-        return this.item.amount;
+        return this.item.quantity;
       },
       set(value) {
         this.$store.dispatch(
           'updateCartProductAmount',
-          { productId: this.item.productId, amount: value },
+          { productId: this.item.id, amount: value },
         );
       },
     },
@@ -54,7 +54,7 @@ export default {
   methods: {
     ...mapActions(['deleteCartProduct']),
     deleteProduct() {
-      this.deleteCartProduct({ productId: this.item.productId });
+      this.deleteCartProduct({ productId: this.item.id });
     },
   },
 

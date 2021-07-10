@@ -16,7 +16,7 @@
         </li>
         <li class="breadcrumbs__item">
           <a class="breadcrumbs__link">
-            {{ product.title }}
+            {{ currProductTitle }}
           </a>
         </li>
       </ul>
@@ -25,62 +25,49 @@
     <section class="item">
       <div class="item__pics pics">
         <div class="pics__wrapper">
-          <img width="570" height="570" :src="product.image.file.url" :alt="product.title">
+          <img width="570" height="570" :src="product.preview.file.url" :alt="product.title">
         </div>
       </div>
 
       <div class="item__info">
         <span class="item__code">Артикул: {{product.id}}</span>
         <h2 class="item__title">
-          {{ product.title }}
+          {{ currProductTitle }}
         </h2>
         <div class="item__form">
           <form class="form" action="#" method="POST" @submit.prevent="addToCart">
             <b class="item__price">
-              {{ product.price | numberFormat}} ₽
+              {{ currProductPrice | numberFormat}} ₽
             </b>
 
             <fieldset class="form__block">
               <legend class="form__legend">Цвет:</legend>
               <ul class="colors">
-                <li class="colors__item" v-for="color in product.colors" :key="color.id">
+                <li class="colors__item" v-for="item in product.colors" :key="item.id">
                   <label class="colors__label">
-                    <input class="colors__radio sr-only" type="radio" :value="color">
-                    <span class="colors__value" :style="{backgroundColor: color.code}">
+                    <input class="colors__radio sr-only" type="radio" :value="item.id"
+                           v-model="colorId">
+                    <span class="colors__value" :style="{backgroundColor: item.color.code}">
                     </span>
                   </label>
                 </li>
               </ul>
             </fieldset>
 
-            <fieldset class="form__block">
-              <legend class="form__legend">Объемб в ГБ:</legend>
+            <fieldset class="form__block" v-if="product.mainProp.id != 7">
+              <legend class="form__legend">{{ product.mainProp.title }}</legend>
 
               <ul class="sizes sizes--primery">
-                <li class="sizes__item">
+                <li class="sizes__item" v-for="offers in product.offers" :key="offers.id">
                   <label class="sizes__label">
-                    <input class="sizes__radio sr-only" type="radio" name="sizes-item"
-                           value="32">
-                    <span class="sizes__value">
-                      32gb
-                    </span>
-                  </label>
-                </li>
-                <li class="sizes__item">
-                  <label class="sizes__label">
-                    <input class="sizes__radio sr-only" type="radio" name="sizes-item" value="64">
-                    <span class="sizes__value">
-                      64gb
-                    </span>
-                  </label>
-                </li>
-                <li class="sizes__item">
-                  <label class="sizes__label">
-                    <input class="sizes__radio sr-only" type="radio" name="sizes-item"
-                           value="128" checked="">
-                    <span class="sizes__value">
-                      128gb
-                    </span>
+                    <div class="sizes__label" v-for="(item, index) in offers.propValues"
+                         :key="index">
+                      <input class="sizes__radio sr-only" type="radio" :value="item.value"
+                             v-model="productOfferPropValue" @click="setOffersPar(offers)">
+                      <span class="sizes__value">
+                      {{item.value}}
+                      </span>
+                    </div>
                   </label>
                 </li>
               </ul>
@@ -173,8 +160,8 @@ import gotoPage from '@/helpers/gotoPage';
 import numberFormat from '@/helpers/numberFormat';
 import ChangeProductAmount from '@/components/ChangeProductAmount.vue';
 import axios from 'axios';
-import { API_BASE_URL } from '@/config';
 import { mapActions } from 'vuex';
+import { API_BASE_URL_DIP } from '@/config';
 
 /* eslint-disable prefer-template */
 /* eslint-disable no-return-assign */
@@ -189,6 +176,11 @@ export default {
       productLoadingFailed: false,
       productAdded: false,
       productAddSending: false,
+      productOfferId: null,
+      productOfferPropValue: null,
+      colorId: null,
+      productTitle: null,
+      productPrice: 0,
     };
   },
   components: { ChangeProductAmount },
@@ -205,6 +197,12 @@ export default {
     currProductId() {
       return this.product.id;
     },
+    currProductTitle() {
+      return this.productTitle;
+    },
+    currProductPrice() {
+      return this.productPrice;
+    },
   },
   methods: {
     ...mapActions(['addProductToCart']),
@@ -213,7 +211,8 @@ export default {
       this.productAdded = false;
       this.productAddSending = true;
       this.addProductToCart({
-        productId: this.product.id,
+        productOfferId: this.productOfferId,
+        colorId: this.colorId,
         amount: this.productAmount,
       }).then(() => {
         this.productAdded = true;
@@ -223,10 +222,23 @@ export default {
     loadProduct() {
       this.productLoading = true;
       this.productLoadingFailed = false;
-      axios.get(API_BASE_URL + 'api/products/' + this.$route.params.id)
+      axios.get(API_BASE_URL_DIP + 'api/products/' + this.$route.params.id)
         .then((response) => this.productData = response.data)
         .catch(() => this.productLoadingFailed = true)
-        .then(() => this.productLoading = false);
+        .then(() => this.productLoading = false)
+        .then(() => this.setDefOffersPar());
+    },
+    setDefOffersPar() {
+      this.productOfferPropValue = this.productData.offers[0].propValues[0].value;
+      this.productOfferId = this.productData.offers[0].id;
+      this.colorId = this.productData.colors[0].id;
+      this.productPrice = this.productData.offers[0].price;
+      this.setOffersPar(this.productData.offers[0]);
+    },
+    setOffersPar(offers) {
+      this.productTitle = offers.title;
+      this.productOfferId = offers.id;
+      this.productPrice = offers.price;
     },
   },
   watch: {
