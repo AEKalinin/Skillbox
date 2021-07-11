@@ -23,7 +23,7 @@
         Корзина
       </h1>
       <span class="content__info">
-        3 товара
+        {{ products.length }} товар(а)
       </span>
     </div>
 
@@ -49,21 +49,14 @@
           </div>
           <div class="cart__options">
             <h3 class="cart__title">Доставка</h3>
-            <ul class="cart__options options">
-              <li class="options__item">
+            <ul class="cart__options options" >
+              <li class="options__item" v-for="item in fromDeliveries"
+                  :key="item.id" :deliveriesPrice="item.price">
                 <label class="options__label">
-                  <input class="options__radio sr-only" type="radio" name="delivery"
-                         value="0" checked="">
+                  <input class="options__radio sr-only" type="radio" :value="item.id"
+                         v-model.number="fromData.deliveryTypeId" @click="Payments(item)">
                   <span class="options__value">
-                    Самовывоз <b>бесплатно</b>
-                  </span>
-                </label>
-              </li>
-              <li class="options__item">
-                <label class="options__label">
-                  <input class="options__radio sr-only" type="radio" name="delivery" value="500">
-                  <span class="options__value">
-                    Курьером <b>500 ₽</b>
+                    {{ item.title }} <b>{{ item.price | numberFormat}} ₽</b>
                   </span>
                 </label>
               </li>
@@ -71,12 +64,12 @@
 
             <h3 class="cart__title">Оплата</h3>
             <ul class="cart__options options">
-              <li class="options__item">
+              <li class="options__item" v-for="item in fromPayments" :key="item.id">
                 <label class="options__label">
-                  <input class="options__radio sr-only" type="radio" name="pay"
-                         value="card" checked="">
+                  <input class="options__radio sr-only" type="radio" :value="item.id"
+                         v-model="paymentTypeId">
                   <span class="options__value">
-                    Картой при получении
+                    {{ item.title }}
                   </span>
                 </label>
               </li>
@@ -95,8 +88,8 @@
           </ul>
 
           <div class="cart__total">
-            <p>Доставка: <b>500 ₽</b></p>
-            <p>Итого: <b>{{ products.length }}</b> товара на сумму <b>
+            <p>Доставка: <b>{{currdeliveriesPrice | numberFormat}} ₽</b></p>
+            <p>Итого: <b>{{ products.length }}</b> товар(а) на сумму <b>
               {{ totalPrice | numberFormat}} ₽</b></p>
           </div>
 
@@ -126,6 +119,7 @@ import preloadProducts from '@/preloadProducts.vue';
 import { API_BASE_URL_DIP } from '../config';
 
 /* eslint-disable prefer-template */
+/* eslint-disable no-return-assign */
 export default {
   filters: { numberFormat },
   components: { BaseFormText, BaseFormTextarea, preloadProducts },
@@ -135,6 +129,10 @@ export default {
       formError: {},
       formErrorMessage: '',
       orderPreloader: false,
+      fromDeliveries: {},
+      fromPayments: {},
+      deliveriesPrice: null,
+      paymentTypeId: null,
     };
   },
   computed: {
@@ -143,6 +141,14 @@ export default {
       allProduct: 'cartAllProduct',
       totalPrice: 'cartTotalPrice',
     }),
+    currdeliveriesPrice() {
+      return this.deliveriesPrice;
+    },
+  },
+  watch: {
+    paymentTypeId(value) {
+      this.fromData.paymentTypeId = value;
+    },
   },
   methods: {
     order() {
@@ -171,6 +177,36 @@ export default {
           });
       }, 500);
     },
+    Deliveries() {
+      this.fromDeliveries = {};
+      axios
+        .get(API_BASE_URL_DIP + 'api/deliveries')
+        .then((response) => this.fromDeliveries = response.data)
+        .then(() => this.setDeliveriesId())
+        .then(() => this.Payments(this.fromDeliveries[0]));
+    },
+    Payments(items) {
+      this.deliveriesPrice = Number(items.price);
+      this.fromPayments = {};
+      axios
+        .get(API_BASE_URL_DIP + 'api/payments', {
+          params: {
+            deliveryTypeId: items.id,
+          },
+        })
+        .then((response) => this.fromPayments = response.data)
+        .then(() => this.setPaymentId(this.fromPayments[0].id));
+    },
+    setDeliveriesId() {
+      this.fromData.deliveryTypeId = this.fromDeliveries[0].id;
+    },
+    setPaymentId(value) {
+      this.fromData.paymentTypeId = value;
+      this.paymentTypeId = value;
+    },
+  },
+  created() {
+    this.Deliveries();
   },
 };
 </script>

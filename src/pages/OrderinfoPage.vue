@@ -80,10 +80,10 @@
         <div class="cart__block">
           <ul class="cart__orders">
             <li class="cart__order" v-for="item in $store.state.orderInfo.basket.items"
-                :key="item.product.id">
-              <h3>{{ item.product.title }}</h3>
-              <b>{{ item.product.price | numberFormat }} ₽</b>
-              <span>Артикул: {{ item.product.id }}</span>
+                :key="item.productOffer.id">
+              <h3>{{ item.productOffer.title }}</h3>
+              <b>{{ item.productOffer.price | numberFormat }} ₽</b>
+              <span>Артикул: {{ item.productOffer.id }}</span>
             </li>
           </ul>
 
