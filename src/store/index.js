@@ -23,6 +23,13 @@ export default new Vuex.Store({
     cartProductsDate: [],
     cartProductsLoading: false,
     orderInfo: null,
+    memoryProductData: [
+      {
+        value: null,
+        checked: false,
+        count: null,
+      },
+    ],
   },
   mutations: {
     updateOrderInfo(state, orderInfo) {
@@ -59,6 +66,14 @@ export default new Vuex.Store({
     },
     chageCartProductsLoading(state) {
       state.cartProductsLoading = !state.cartProductsLoading;
+    },
+    syncMemoryProductData(state, products) {
+      let i;
+      for (i = 0; i < products.length;) {
+        alert(i);
+        state.memoryProductData[i].value = 1;
+        i += 1;
+      }
     },
   },
   getters: {
@@ -107,7 +122,7 @@ export default new Vuex.Store({
             context.commit('syncCartProducts');
           })
           .then(() => context.commit('chageCartProductsLoading'));
-      }, 500);
+      }, 100);
     },
     addProductToCart(context, { productOfferId, colorId, amount }) {
       return (new Promise((resolve) => setTimeout(resolve, 100)))

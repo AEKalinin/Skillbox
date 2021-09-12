@@ -87,68 +87,25 @@
       </div>
 
       <div class="item__desc">
-        <ul class="tabs">
-          <li class="tabs__item">
-            <a class="tabs__link tabs__link--current">
-              Описание
-            </a>
-          </li>
-          <li class="tabs__item">
-            <a class="tabs__link" href="#">
-              Характеристики
-            </a>
-          </li>
-          <li class="tabs__item">
-            <a class="tabs__link" href="#">
-              Гарантия
-            </a>
-          </li>
-          <li class="tabs__item">
-            <a class="tabs__link" href="#">
-              Оплата и доставка
+        <ul class="tabs" >
+          <li class="tabs__item" v-for="(tab, index) in productTabs" :key="index"
+              @click.prevent="selectProuctTabs = tab">
+            <a :class=getClassProductTabs(tab) href="#">
+              {{ tab }}
             </a>
           </li>
         </ul>
-
-        <div class="item__content">
-          <p>
-            Навигация GPS, ГЛОНАСС, BEIDOU Galileo и QZSS<br>
-            Синхронизация со смартфоном<br>
-            Связь по Bluetooth Smart, ANT+ и Wi-Fi<br>
-            Поддержка сторонних приложений<br>
-          </p>
-
-          <a href="#">
-            Все характеристики
-          </a>
-
-          <h3>Что это?</h3>
-
-          <p>
-            Wahoo ELEMNT BOLT GPS – это велокомпьютер, который позволяет оптимизировать свои
-            велотренировки, сделав их максимально эффективными. Wahoo ELEMNT BOLT GPS
-            синхронизируется с датчиками по ANT+, объединяя полученную с них информацию.
-            Данные отображаются на дисплее, а также сохраняются на смартфоне.
-            При этом на мобильное устройство можно установить как фирменное приложение, так и
-            различные приложения сторонних разработчиков. Велокомпьютер точно отслеживает
-            местоположение, принимая сигнал с целого комплекса спутников. Эта информация позволяет
-            смотреть уже преодоленные маршруты ипланировать новые велопрогулки.
-          </p>
-
-          <h3>Дизайн</h3>
-
-          <p>
-            Велокомпьютер Wahoo ELEMNT BOLT очень компактный. Размеры устройства составляют всего
-            74,6 x 47,3 x 22,1 мм. что не превышает габариты смартфона. Корпус гаджета выполнен из
-            черного пластика. На обращенной к пользователю стороне расположен дисплей
-            диагональю 56 мм. На дисплей выводятся координаты и скорость, а также полученная со
-            смартфона и синхронизированных датчиков информация: интенсивность, скорость вращения
-            педалей, пульс и т.д. (датчики не входят в комплект поставки). Корпус велокомпьютера
-            имеет степень защиты от влаги IPX7. Это означает, что устройство не боится пыли, а
-            также выдерживает кратковременное (до 30 минут) погружение в воду на глубину не более
-            1 метра.
-          </p>
-        </div>
+      </div>
+      <div class="item__content" v-show="selectProuctTabs === 'Описание'">
+        <p>
+          {{ product.title }}
+        </p>
+      </div>
+      <div class="item__content" v-show="selectProuctTabs === 'Характеристики'">
+        <p v-for="offers in product.specifications" :key="offers.id">
+          {{ offers.title  }}
+          {{ offers.value  }}
+        </p>
       </div>
     </section>
   </main>
@@ -181,6 +138,8 @@ export default {
       colorId: null,
       productTitle: null,
       productPrice: 0,
+      productTabs: ['Описание', 'Характеристики'],
+      selectProuctTabs: 'Описание',
     };
   },
   components: { ChangeProductAmount },
@@ -239,6 +198,15 @@ export default {
       this.productTitle = offers.title;
       this.productOfferId = offers.id;
       this.productPrice = offers.price;
+    },
+    getClassProductTabs(isTab) {
+      let activeTabClass;
+      if (isTab === this.selectProuctTabs) {
+        activeTabClass = 'tabs__link tabs__link--current';
+      } else {
+        activeTabClass = 'tabs__link';
+      }
+      return activeTabClass;
     },
   },
   watch: {

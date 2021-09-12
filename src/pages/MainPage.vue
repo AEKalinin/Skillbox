@@ -34,6 +34,7 @@ import BasePaginattion from '@/components/BasePaginattion.vue';
 import ProductFilter from '@/components/ProductFilter.vue';
 import preloadProducts from '@/preloadProducts.vue';
 import axios from 'axios';
+import { mapMutations } from 'vuex';
 import { API_BASE_URL_DIP } from '../config';
 
 /* eslint-disable prefer-template */
@@ -49,12 +50,12 @@ export default {
   },
   data() {
     return {
-      filterPriceFrom: 1,
-      filterPriceTo: 100000,
+      filterPriceFrom: 0,
+      filterPriceTo: 0,
       filterCategoryId: 0,
       filterColorValue: 0,
       page: 1,
-      productsPerPage: 3,
+      productsPerPage: 12,
       productsData: null,
       productsLoading: false,
       productsLoadingFailed: false,
@@ -69,7 +70,20 @@ export default {
     },
   },
   methods: {
+    ...mapMutations(['syncMemoryProductData']),
     loadProducts() {
+      let minProce;
+      let maxnProce;
+      if (this.filterPriceFrom <= 0) {
+        minProce = 1;
+      } else {
+        minProce = this.filterPriceFrom;
+      }
+      if (this.filterPriceTo <= 0) {
+        maxnProce = 0xFFFFFFFFFFFFFFF;
+      } else {
+        maxnProce = this.filterPriceTo;
+      }
       this.productsLoading = true;
       this.productsLoadingFailed = false;
       clearTimeout(this.loadProductsTimer);
@@ -79,14 +93,18 @@ export default {
             page: this.page,
             limit: this.productsPerPage,
             categoryId: this.filterCategoryId,
-            minPrice: this.filterPriceFrom,
-            maxPrice: this.filterPriceTo,
+            minPrice: minProce,
+            maxPrice: maxnProce,
           },
         })
           .then((response) => this.productsData = response.data)
           .catch(() => this.productsLoadingFailed = true)
-          .then(() => this.productsLoading = false);
+          .then(() => this.productsLoading = false)
+          .then(() => this.syncMemoryProduct());
       }, 500);
+    },
+    syncMemoryProduct() {
+      this.syncMemoryProductData(this.productsData.items);
     },
   },
   watch: {
