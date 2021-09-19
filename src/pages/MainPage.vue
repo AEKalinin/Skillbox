@@ -34,10 +34,12 @@ import BasePaginattion from '@/components/BasePaginattion.vue';
 import ProductFilter from '@/components/ProductFilter.vue';
 import preloadProducts from '@/preloadProducts.vue';
 import axios from 'axios';
-import { mapMutations } from 'vuex';
+import { mapActions } from 'vuex';
 import { API_BASE_URL_DIP } from '../config';
 
 /* eslint-disable prefer-template */
+/* eslint-disable quotes */
+/* eslint-disable max-len */
 /* eslint-disable no-return-assign */
 /* eslint-disable no-template-curly-in-string */
 /* eslint arrow-body-style: ["error", "as-needed", { "requireReturnForObjectLiteral": true }] */
@@ -70,7 +72,8 @@ export default {
     },
   },
   methods: {
-    ...mapMutations(['syncMemoryProductData']),
+    ...mapActions(['addMemoryPropProduct']),
+    ...mapActions(['clearMemoryPropProduct']),
     loadProducts() {
       let minProce;
       let maxnProce;
@@ -104,7 +107,23 @@ export default {
       }, 500);
     },
     syncMemoryProduct() {
-      this.syncMemoryProductData(this.productsData.items);
+      let i;
+      let j;
+      let k;
+      this.clearMemoryPropProduct();
+      for (i = 0; i < this.productsData.items.length;) {
+        for (j = 0; j < this.productsData.items[i].offers.length;) {
+          for (k = 0; k < this.productsData.items[i].offers[j].propValues.length;) {
+            if (this.productsData.items[i].offers[j].propValues[k].productProp.code !== "built_in_memory") {
+              break;
+            }
+            this.addMemoryPropProduct({ Volume: this.productsData.items[i].offers[j].propValues[k].value });
+            k += 1;
+          }
+          j += 1;
+        }
+        i += 1;
+      }
     },
   },
   watch: {

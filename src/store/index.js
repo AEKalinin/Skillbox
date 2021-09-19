@@ -10,6 +10,7 @@ Vue.use(Vuex);
 /* eslint-disable arrow-body-style */
 /* eslint-disable object-shorthand */
 /* eslint-disable no-shadow */
+/* eslint-disable quotes */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable prefer-template */
 /* eslint-disable no-return-assign */
@@ -23,13 +24,12 @@ export default new Vuex.Store({
     cartProductsDate: [],
     cartProductsLoading: false,
     orderInfo: null,
-    memoryProductData: [
-      {
-        value: null,
-        checked: false,
-        count: null,
-      },
-    ],
+    memoryPropValues: [],
+    propValues: {
+      value: null,
+      count: 1,
+      check: false,
+    },
   },
   mutations: {
     updateOrderInfo(state, orderInfo) {
@@ -67,13 +67,30 @@ export default new Vuex.Store({
     chageCartProductsLoading(state) {
       state.cartProductsLoading = !state.cartProductsLoading;
     },
-    syncMemoryProductData(state, products) {
-      let i;
-      for (i = 0; i < products.length;) {
-        alert(i);
-        state.memoryProductData[i].value = 1;
-        i += 1;
+    addMemoryProp(state, { Volume }) {
+      let l;
+      let fndV;
+      fndV = -1;
+      state.propValues = {};
+      state.propValues.value = Volume;
+      state.propValues.count = 1;
+      state.propValues.check = false;
+      for (l = 0; l < state.memoryPropValues.length;) {
+        if (state.memoryPropValues[l].value === Volume) {
+          fndV = l;
+          state.propValues.count = state.memoryPropValues[l].count + 1;
+          break;
+        }
+        l += 1;
       }
+      if (fndV > -1) {
+        Vue.set(state.memoryPropValues[fndV], "count", state.propValues.count);
+      } else {
+        state.memoryPropValues.push(state.propValues);
+      }
+    },
+    clearMemoryProp(state) {
+      state.memoryPropValues = [];
     },
   },
   getters: {
@@ -90,6 +107,9 @@ export default new Vuex.Store({
     cartAllProduct(state, getters) {
       return getters.cartDetailProduct.reduce((acc, item) => (item.quantity)
         + acc, 0);
+    },
+    memoryProp(state) {
+      return state.memoryPropValues;
     },
   },
   actions: {
@@ -177,6 +197,12 @@ export default new Vuex.Store({
               context.commit('syncCartProducts');
             });
         });
+    },
+    addMemoryPropProduct(context, { Volume }) {
+      context.commit('addMemoryProp', { Volume });
+    },
+    clearMemoryPropProduct(context) {
+      context.commit('clearMemoryProp');
     },
   },
 });
