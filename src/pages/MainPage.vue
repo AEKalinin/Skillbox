@@ -11,7 +11,8 @@
 
     <div class="content__catalog">
       <ProductFilter :price-from.sync="filterPriceFrom" :price-to.sync="filterPriceTo"
-                     :category-id.sync="filterCategoryId" :color-value.sync="filterColorValue"
+                     :category-id.sync="filterCategoryId" :color-index.sync="filterColorIndex"
+                     :color-title.sync="filterColorTitle"
       />
       <section class="catalog">
         <preloadProducts v-if="productsLoading" message="Загрузка товаров"> </preloadProducts>
@@ -55,7 +56,8 @@ export default {
       filterPriceFrom: 0,
       filterPriceTo: 0,
       filterCategoryId: 0,
-      filterColorValue: 0,
+      filterColorIndex: null,
+      filterColorTitle: null,
       page: 1,
       productsPerPage: 12,
       productsData: null,
@@ -75,8 +77,10 @@ export default {
     ...mapActions(['addMemoryPropProduct']),
     ...mapActions(['clearMemoryPropProduct']),
     loadProducts() {
+      let i;
       let minProce;
       let maxnProce;
+      let prodProps;
       if (this.filterPriceFrom <= 0) {
         minProce = 1;
       } else {
@@ -87,11 +91,24 @@ export default {
       } else {
         maxnProce = this.filterPriceTo;
       }
+      prodProps = "";
+      if (this.filterColorTitle !== null) {
+        prodProps = "&props[color][]=" + this.filterColorTitle;
+      }
+      for (i = 0; i < this.$store.state.memoryPropValues.length;) {
+        if (this.$store.state.memoryPropValues[i].check === true) {
+          prodProps = prodProps + "&props[" + this.$store.state.memoryPropValues[i].code + "][]=" + this.$store.state.memoryPropValues[i].value;
+        }
+        i += 1;
+      }
+      if (prodProps !== "") {
+        prodProps = "?" + prodProps;
+      }
       this.productsLoading = true;
       this.productsLoadingFailed = false;
       clearTimeout(this.loadProductsTimer);
       this.loadProductsTimer = setTimeout(() => {
-        axios.get(API_BASE_URL_DIP + 'api/products', {
+        axios.get(API_BASE_URL_DIP + 'api/products' + prodProps, {
           params: {
             page: this.page,
             limit: this.productsPerPage,
@@ -117,7 +134,7 @@ export default {
             if (this.productsData.items[i].offers[j].propValues[k].productProp.code !== "built_in_memory") {
               break;
             }
-            this.addMemoryPropProduct({ Volume: this.productsData.items[i].offers[j].propValues[k].value });
+            this.addMemoryPropProduct({ codeProp: this.productsData.items[i].mainProp.code, Volume: this.productsData.items[i].offers[j].propValues[k].value, check: false });
             k += 1;
           }
           j += 1;
@@ -139,7 +156,7 @@ export default {
     filterCategoryId() {
       this.loadProducts();
     },
-    filterColorValue() {
+    filterColorIndex() {
       this.loadProducts();
     },
   },

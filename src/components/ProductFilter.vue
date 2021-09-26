@@ -30,9 +30,9 @@
   <fieldset class="form__block">
     <legend class="form__legend">Цвет</legend>
     <ul class="colors">
-        <label class="colors__label" v-for="color in colors" :key="color.id" >
-          <input class="colors__radio sr-only" type="radio" name="color" :value="color.id"
-                 v-model="currentColorValue">
+        <label class="colors__label" v-for="(color, index) in colors" :key="index" >
+          <input class="colors__radio sr-only" type="radio"
+                 :value="color.id" v-model="currentColorIndex">
           <span class="colors__value" :style="{backgroundColor: color.code}">
           </span>
         </label>
@@ -40,11 +40,12 @@
   </fieldset>
 
   <fieldset class="form__block">
-    <legend class="form__legend">Объем в ГБ</legend>
+    <legend class="form__legend" v-if="$store.state.memoryPropValuesEx">Объем в ГБ</legend>
     <ul class="check-list">
       <li class="check-list__item" v-for="item in memoryProp" :key="item.value">
         <label class="check-list__label">
-          <input class="check-list__check sr-only" type="checkbox" :checked= "item.check">
+          <input class="check-list__check sr-only" type="checkbox" :checked= "item.check"
+                 @click="memoryCheck(item.value,!item.check)">
           <span class="check-list__desc">
                     {{ item.value }}
                     <span>({{ item.count }})</span>
@@ -54,7 +55,7 @@
     </ul>
   </fieldset>
 
-  <button class="filter__submit button button--primery" type="submit">
+  <button class="filter__submit button button--primery" type="button" @click.prevent="submit">
     Применить
   </button>
   <button class="filter__reset button button--second" type="button" @click.prevent="reset">
@@ -70,7 +71,7 @@
 /* eslint-disable import/no-duplicates */
 
 import axios from 'axios';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import { API_BASE_URL_DIP } from '@/config';
 
 export default {
@@ -79,12 +80,13 @@ export default {
       currentPriceFrom: 0,
       currentPriceFTo: 0,
       currentCategoryId: 0,
-      currentColorValue: 0,
+      currentColorIndex: null,
+      currentColorTitle: null,
       categoriesData: null,
       colorsData: null,
     };
   },
-  props: ['priceFrom', 'priceTo', 'categoryId', 'colorValue'],
+  props: ['priceFrom', 'priceTo', 'categoryId', 'colorIndex', 'colorTitle'],
   computed: {
     categories() {
       return this.categoriesData ? this.categoriesData.items : [];
@@ -106,22 +108,30 @@ export default {
     categoryId(value) {
       this.currentCategoryId = value;
     },
-    colorValue(value) {
-      this.currentColorValue = value;
+    colorIndex(value) {
+      this.currentColorIndex = value;
+    },
+    colorTitle(value) {
+      this.currentColorTitle = value;
     },
   },
   methods: {
+    ...mapActions(['changeMemoryPropProduct']),
     submit() {
       this.$emit('update:priceFrom', this.currentPriceFrom);
       this.$emit('update:priceTo', this.currentPriceFTo);
       this.$emit('update:categoryId', this.currentCategoryId);
-      this.$emit('update:colorValue', this.currentColorValue);
+      this.$emit('update:colorIndex', this.currentColorIndex);
+      if (this.currentColorIndex !== null) {
+        this.$emit('update:colorTitle', this.colorsData.items[this.currentColorIndex - 1].title);
+      }
     },
     reset() {
       this.$emit('update:priceFrom', 0);
       this.$emit('update:priceTo', 0);
       this.$emit('update:categoryId', 0);
-      this.$emit('update:colorValue', null);
+      this.$emit('update:colorIndex', null);
+      this.$emit('update:colorTitle', null);
     },
     loadCategories() {
       axios.get(API_BASE_URL_DIP + 'api/productCategories')
@@ -130,6 +140,9 @@ export default {
     loadColors() {
       axios.get(API_BASE_URL_DIP + 'api/colors')
         .then((response) => this.colorsData = response.data);
+    },
+    memoryCheck(value, itemCheck) {
+      this.changeMemoryPropProduct({ Volume: value, check: itemCheck });
     },
   },
   created() {

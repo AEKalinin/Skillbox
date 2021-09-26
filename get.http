@@ -1,2 +1,2 @@
-DELETE https://vue-study.skillbox.cc/api/baskets/products?userAccessKey=3fb5ad6508e48db54555adc5194ed93b&productId=14
+https://vue-tzr.skillbox.cc/api/products?&props[color][]=Черный&page=1&limit=12&categoryId=0&minPrice=1&maxPrice=1152921504606847000
 

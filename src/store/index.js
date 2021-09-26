@@ -24,8 +24,10 @@ export default new Vuex.Store({
     cartProductsDate: [],
     cartProductsLoading: false,
     orderInfo: null,
+    memoryPropValuesEx: false,
     memoryPropValues: [],
     propValues: {
+      code: null,
       value: null,
       count: 1,
       check: false,
@@ -67,14 +69,15 @@ export default new Vuex.Store({
     chageCartProductsLoading(state) {
       state.cartProductsLoading = !state.cartProductsLoading;
     },
-    addMemoryProp(state, { Volume }) {
+    addMemoryProp(state, { codeProp, Volume, check }) {
       let l;
       let fndV;
       fndV = -1;
       state.propValues = {};
+      state.propValues.code = codeProp;
       state.propValues.value = Volume;
       state.propValues.count = 1;
-      state.propValues.check = false;
+      state.propValues.check = check;
       for (l = 0; l < state.memoryPropValues.length;) {
         if (state.memoryPropValues[l].value === Volume) {
           fndV = l;
@@ -88,9 +91,25 @@ export default new Vuex.Store({
       } else {
         state.memoryPropValues.push(state.propValues);
       }
+      state.memoryPropValuesEx = true;
     },
     clearMemoryProp(state) {
       state.memoryPropValues = [];
+      state.memoryPropValuesEx = false;
+    },
+    changeMemoryProp(state, { Volume, check }) {
+      let l;
+      let fndV;
+      fndV = -1;
+      for (l = 0; l < state.memoryPropValues.length;) {
+        if (state.memoryPropValues[l].value === Volume) {
+          fndV = l;
+          state.propValues.count = state.memoryPropValues[l].count + 1;
+          break;
+        }
+        l += 1;
+      }
+      Vue.set(state.memoryPropValues[fndV], "check", check);
     },
   },
   getters: {
@@ -198,8 +217,11 @@ export default new Vuex.Store({
             });
         });
     },
-    addMemoryPropProduct(context, { Volume }) {
-      context.commit('addMemoryProp', { Volume });
+    addMemoryPropProduct(context, { codeProp, Volume, check }) {
+      context.commit('addMemoryProp', { codeProp, Volume, check });
+    },
+    changeMemoryPropProduct(context, { Volume, check }) {
+      context.commit('changeMemoryProp', { Volume, check });
     },
     clearMemoryPropProduct(context) {
       context.commit('clearMemoryProp');
