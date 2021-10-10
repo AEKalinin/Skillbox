@@ -86,7 +86,7 @@ export default {
       currentPropsCheck: 0,
       categoriesData: null,
       colorsData: null,
-      changeParamsFilters: false,
+      changeParamsFilters: true,
     };
   },
   props: ['priceFrom', 'priceTo', 'categoryId', 'colorIndex', 'colorTitle', 'propsCheck'],
