@@ -30,22 +30,23 @@
   <fieldset class="form__block">
     <legend class="form__legend">Цвет</legend>
     <ul class="colors">
-        <label class="colors__label" v-for="(color, index) in colors" :key="index" >
-          <input class="colors__radio sr-only" type="radio"
-                 :value="color.id" v-model="currentColorIndex">
-          <span class="colors__value" :style="{backgroundColor: color.code}">
+      <label class="colors__label" v-for="(color, index) in colors" :key="index" >
+        <input class="colors__radio sr-only" type="radio"
+               :value="color.id" v-model="currentColorIndex">
+        <span class="colors__value" :style="{backgroundColor: color.code}">
           </span>
-        </label>
+      </label>
     </ul>
   </fieldset>
 
   <fieldset class="form__block">
-    <legend class="form__legend" v-if="$store.state.memoryPropValuesEx">Объем в ГБ</legend>
-    <ul class="check-list">
+    <legend class="form__legend" v-if="$store.state.memoryPropValuesEx">Объем в ГБ </legend>
+    <ul class="check-list" >
       <li class="check-list__item" v-for="item in memoryProp" :key="item.value">
-        <label class="check-list__label">
+        <label class="check-list__label" >
           <input class="check-list__check sr-only" type="checkbox" :checked= "item.check"
-                 @click="memoryCheck(item.value,!item.check)">
+                 @click="memoryCheck(item.value,!item.check)"
+          >
           <span class="check-list__desc">
                     {{ item.value }}
                     <span>({{ item.count }})</span>
@@ -55,7 +56,7 @@
     </ul>
   </fieldset>
 
-  <button class="filter__submit button button--primery" type="button" @click.prevent="submit">
+  <button class="filter__submit button button--primery" type="submit">
     Применить
   </button>
   <button class="filter__reset button button--second" type="button" @click.prevent="reset">
@@ -82,11 +83,13 @@ export default {
       currentCategoryId: 0,
       currentColorIndex: null,
       currentColorTitle: null,
+      currentPropsCheck: 0,
       categoriesData: null,
       colorsData: null,
+      changeParamsFilters: false,
     };
   },
-  props: ['priceFrom', 'priceTo', 'categoryId', 'colorIndex', 'colorTitle'],
+  props: ['priceFrom', 'priceTo', 'categoryId', 'colorIndex', 'colorTitle', 'propsCheck'],
   computed: {
     categories() {
       return this.categoriesData ? this.categoriesData.items : [];
@@ -101,30 +104,44 @@ export default {
   watch: {
     priceFrom(value) {
       this.currentPriceFrom = value;
+      this.changeParamsFilters = true;
     },
     priceTo(value) {
       this.currentPriceFTo = value;
+      this.changeParamsFilters = true;
     },
     categoryId(value) {
       this.currentCategoryId = value;
+      this.changeParamsFilters = true;
     },
     colorIndex(value) {
       this.currentColorIndex = value;
+      this.changeParamsFilters = true;
     },
     colorTitle(value) {
       this.currentColorTitle = value;
+      this.changeParamsFilters = true;
+    },
+    propsCheck(value) {
+      this.currentPropsCheck = value;
     },
   },
   methods: {
     ...mapActions(['changeMemoryPropProduct']),
+    ...mapActions(['clearMemoryPropProduct']),
     submit() {
       this.$emit('update:priceFrom', this.currentPriceFrom);
       this.$emit('update:priceTo', this.currentPriceFTo);
       this.$emit('update:categoryId', this.currentCategoryId);
       this.$emit('update:colorIndex', this.currentColorIndex);
+      this.$emit('update:propsCheck', this.currentPropsCheck);
       if (this.currentColorIndex !== null) {
         this.$emit('update:colorTitle', this.colorsData.items[this.currentColorIndex - 1].title);
       }
+      if (this.changeParamsFilters) {
+        this.clearMemoryPropProduct();
+      }
+      this.changeParamsFilters = false;
     },
     reset() {
       this.$emit('update:priceFrom', 0);
@@ -132,6 +149,9 @@ export default {
       this.$emit('update:categoryId', 0);
       this.$emit('update:colorIndex', null);
       this.$emit('update:colorTitle', null);
+      this.$emit('update:propsCheck', 0);
+      this.clearMemoryPropProduct();
+      this.changeParamsFilters = false;
     },
     loadCategories() {
       axios.get(API_BASE_URL_DIP + 'api/productCategories')
@@ -143,6 +163,7 @@ export default {
     },
     memoryCheck(value, itemCheck) {
       this.changeMemoryPropProduct({ Volume: value, check: itemCheck });
+      this.currentPropsCheck += 1;
     },
   },
   created() {

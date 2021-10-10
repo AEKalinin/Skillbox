@@ -13,6 +13,7 @@
       <ProductFilter :price-from.sync="filterPriceFrom" :price-to.sync="filterPriceTo"
                      :category-id.sync="filterCategoryId" :color-index.sync="filterColorIndex"
                      :color-title.sync="filterColorTitle"
+                     :props-check.sync="filterPropsCheck"
       />
       <section class="catalog">
         <preloadProducts v-if="productsLoading" message="Загрузка товаров"> </preloadProducts>
@@ -58,6 +59,7 @@ export default {
       filterCategoryId: 0,
       filterColorIndex: null,
       filterColorTitle: null,
+      filterPropsCheck: 0,
       page: 1,
       productsPerPage: 12,
       productsData: null,
@@ -75,7 +77,6 @@ export default {
   },
   methods: {
     ...mapActions(['addMemoryPropProduct']),
-    ...mapActions(['clearMemoryPropProduct']),
     loadProducts() {
       let i;
       let minProce;
@@ -104,6 +105,7 @@ export default {
       if (prodProps !== "") {
         prodProps = "?" + prodProps;
       }
+      console.log(prodProps);
       this.productsLoading = true;
       this.productsLoadingFailed = false;
       clearTimeout(this.loadProductsTimer);
@@ -127,7 +129,6 @@ export default {
       let i;
       let j;
       let k;
-      this.clearMemoryPropProduct();
       for (i = 0; i < this.productsData.items.length;) {
         for (j = 0; j < this.productsData.items[i].offers.length;) {
           for (k = 0; k < this.productsData.items[i].offers[j].propValues.length;) {
@@ -157,6 +158,9 @@ export default {
       this.loadProducts();
     },
     filterColorIndex() {
+      this.loadProducts();
+    },
+    filterPropsCheck() {
       this.loadProducts();
     },
   },
